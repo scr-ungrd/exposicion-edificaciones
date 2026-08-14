@@ -9,7 +9,7 @@ El insumo base son las huellas de edificaciones del conjunto de datos [Open Buil
 
 <!-- TODO: precisar versión del dataset, fecha de exportación y filtro de confianza aplicado -->
 
-## Procesamiento
+## Procesamiento y advertencia
 
 Dado el volumen del conjunto de datos (6.038.048 polígonos), no es viable representar cada edificación individualmente en un mapa del libro. En su lugar, se calcula el centroide de cada polígono y se agregan sobre una grilla regular de 2 × 2 km, contando el número de edificaciones por celda. El resultado es un mapa raster estático de densidad, mucho más liviano y apropiado para un documento de este tipo que el conjunto de polígonos original (1.1 GB).
 

@@ -4,18 +4,17 @@ title: "Página Legal"
 
 <!-- TODO: completar título exacto, palabras clave y DOI propios de este libro (no reutilizar el DOI de otro título de la serie) -->
 
-Exposición de edificaciones en Colombia. Bogotá, D.C., Unidad Nacional para la Gestión del Riesgo de Desastres, 2026. DOI: <PENDIENTE>
+Escenario de daño sismo San José del Palmar. Bogotá, D.C., Unidad Nacional para la Gestión del Riesgo de Desastres, 2026. DOI: <PENDIENTE>
 1. Edificaciones—exposición 2. Gestión del riesgo de desastres—Colombia 3. Análisis de exposición—amenazas naturales 4. Ordenamiento territorial—gestión del riesgo municipal
 
 ------------------------------------------------------------------------
 
 ::: {style="line-height: 0.96;"}
-**Gustavo Petro Urrego** \| Presidente de la República
+**Abelardo De La Espriella** \| Presidente de la República
 
-**Carlos Alberto Carrillo Arenas** \| Director General,
+**David Santiago Tamayo** \| Director General,
 Unidad Nacional para la Gestión del Riesgo de Desastres (UNGRD)
 
-**Ana Milena Prada Uribe** \| Subdirectora para el Conocimiento del Riesgo
 
 ------------------------------------------------------------------------
 

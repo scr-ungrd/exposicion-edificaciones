@@ -2,4 +2,4 @@
 
 <!-- TODO: redactar presentación institucional del libro (objetivo, alcance, público) -->
 
-Este libro presenta la caracterización de la exposición de edificaciones en Colombia a partir de datos de huellas de construcción derivados de imágenes satelitales, como insumo para el análisis de riesgo de desastres a nivel nacional.
+Este documento presenta la caracterización de la exposición de edificaciones en Colombia a partir de datos de huellas de construcción derivados de imágenes satelitales, como insumo para el análisis de riesgo de desastres causado por el sismo de San José del Palmar.

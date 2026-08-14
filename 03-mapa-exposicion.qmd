@@ -1,4 +1,4 @@
-# Mapa de exposición de edificaciones {.unnumbered}
+# Mapa de escenario de daño {.unnumbered}
 
 <!-- TODO: el conjunto de datos disponible cubre el corredor andino suroccidental
      (Valle del Cauca, Cauca y zonas aledañas), no la totalidad del territorio nacional.
