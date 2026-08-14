@@ -64,6 +64,12 @@ Los scripts (`*.py`, `*.sh`), `data/area_por_municipio.csv` y `data/colombia_mod
 7. Agregar el `.pmtiles` a `project.resources` en `_quarto.yml` — sin esto, Quarto no lo copia a `_book/` (ni local ni en CI) porque solo se referencia desde JS, no desde un link/img estático. El síntoma es engañoso: todo renderiza sin error y la Action de despliegue queda en verde, pero el mapa no carga ningún edificio.
 8. **Después de desplegar, verificar con `curl -I https://.../data/tu-archivo.pmtiles` que responda `200`, no `404`.** Un despliegue exitoso (Action en verde) no significa que el `.pmtiles` haya llegado al sitio — hay que comprobarlo aparte.
 
+### Bug de Quarto: celdas `{ojs}` con varias declaraciones top-level pueden fallar en proyectos `type: book`
+
+Si un bloque ```` ```{ojs} ```` tiene **más de una** declaración top-level (p. ej. `a = ...` seguido de `b = ...` en el mismo bloque), en este proyecto (`type: book`, Quarto 1.9.38) el mapa/celda se queda permanentemente en estado `ojs-in-a-box-waiting-for-module-import` — nunca llega a pedir los datos por red. La consola a veces ni siquiera muestra el error real: el manejador de errores interno de Quarto (`quarto-ojs-runtime.js`) intenta hacer `targetElement.querySelector(...)` sobre un `targetElement` que es `null`, y esa segunda excepción (`Cannot read properties of null`) tapa el mensaje original ("Ran out of quarto subfigures" — Quarto no reservó suficientes contenedores DOM para esa celda).
+
+**Solución confirmada:** dividir cada celda con múltiples declaraciones en varias celdas ```` ```{ojs} ```` de **una sola declaración cada una**. Se aplicó en `02-mapa-exposicion.qmd` (bloque de `dept_all`/`mun_all`/`dept`/`mun`/etc., 6 declaraciones → 6 celdas) y en `03-viviendas-afectadas.qmd` desde el principio, y ambos mapas funcionan. Costó varias rondas de diagnóstico porque el síntoma es engañoso (sin error visible, o un error que apunta al lugar equivocado) — si un mapa OJS se queda "cargando" sin motivo aparente en un libro, esto es lo primero a revisar, antes de sospechar de rutas o `resources:`.
+
 ### Recursos estáticos referenciados solo desde código (JS/OJS) — declararlos en `resources:`
 
 Lección general (ya no aplica al `.pmtiles`, que se sacó del repo, pero sigue aplicando a `data/area_por_municipio.csv` y `data/colombia_moderate.topojson`, que si están vigentes): Quarto no detecta automáticamente como recurso a copiar a `_book/` un archivo que solo se referencia desde una URL armada en JS/OJS (`FileAttachment(...)`, `fetch(...)`), a diferencia de un link/img estático que sí puede rastrear. Hay que declararlo explícitamente en `project.resources` en `_quarto.yml` — si no, el render "funciona" (no da error) pero el archivo no llega a `_book/`, la Action de CI queda en verde, y el síntoma solo aparece en el navegador (datos/mapa vacíos). **Después de cualquier cambio a `_quarto.yml`, `.gitignore` o los datos de un mapa OJS, verificar con `curl -I https://.../data/archivo` que responda `200`, no `404`** — un despliegue en verde no lo garantiza.
@@ -76,12 +82,17 @@ quarto render           # compila el sitio HTML estático a _book/
 quarto render --to pdf  # compila la versión PDF (requiere motor LaTeX, p.ej. TinyTeX)
 ```
 
+## Capítulo 3: Viviendas afectadas
+
+`03-viviendas-afectadas.qmd` — tabla + mapa D3/OJS (coroplético, Valle del Cauca, con nombre de cada municipio siempre visible) + gráfico de barras (Observable Plot) del `% de viviendas afectadas`. Fuente: `~/Downloads/VIVIENDAS AFECTADAS ANALISIS.xlsx` (fuera de este repo), limpiado y con nombres de municipio normalizados (el Excel no trae tildes) por `data/procesar_viviendas_afectadas.py` → `data/viviendas_afectadas_valle.csv`. El Excel original no incluye a Santiago de Cali (se muestra en gris en el mapa, no es un bug). Cada celda `{ojs}` de este capítulo se escribió desde el inicio como una declaración por celda (ver bug de subfiguras arriba).
+
 ## Pendientes conocidos (marcados como TODO en los .qmd)
 
 - Portada propia (actualmente usa el logo genérico UNGRD en vez de un cubo/portada dedicada).
 - Texto de `presentacion.qmd`.
 - DOI y metadatos definitivos en `Pagina-legal.qmd` (actualmente placeholders `PENDIENTE`).
-- El dataset cubre el corredor andino suroccidental de Colombia, no la totalidad del territorio nacional — ajustar alcance/título si se espera cobertura nacional.
+- El dataset de edificaciones (cap. 1-2) cubre el corredor andino suroccidental de Colombia, no la totalidad del territorio nacional — ajustar alcance/título si se espera cobertura nacional.
+- Fuente/fecha del evento de origen de `VIVIENDAS AFECTADAS ANALISIS.xlsx` (cap. 3) sin documentar en el Excel original.
 
 ## Estructura y orden de capítulos
 
@@ -89,5 +100,5 @@ El orden y la lista de capítulos viven en `_quarto.yml` (`book.chapters`):
 
 ```
 index.qmd → Pagina-legal.qmd → presentacion.qmd → 01-metodologia.qmd →
-02-mapa-exposicion.qmd → 03-referencias-bibliograficas.qmd
+02-mapa-exposicion.qmd → 03-viviendas-afectadas.qmd → 04-referencias-bibliograficas.qmd
 ```

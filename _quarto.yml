@@ -4,6 +4,7 @@ project:
   resources:
     - data/area_por_municipio.csv
     - data/colombia_moderate.topojson
+    - data/viviendas_afectadas_valle.csv
 
 book:
   title: "Exposición de edificaciones sismo de San José del Palmar"
@@ -40,7 +41,9 @@ book:
       href: 01-metodologia.qmd
     - text: "2. Mapa de exposición de edificaciones"
       href: 02-mapa-exposicion.qmd
-    - 03-referencias-bibliograficas.qmd
+    - text: "3. Viviendas afectadas"
+      href: 03-viviendas-afectadas.qmd
+    - 04-referencias-bibliograficas.qmd
 
 lang: es
 

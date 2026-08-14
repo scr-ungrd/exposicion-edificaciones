@@ -47,17 +47,35 @@ Mapa interactivo — solo se muestran los departamentos con al menos un municipi
 ```{ojs}
 //| echo: false
 topo = FileAttachment("data/colombia_moderate.topojson").json()
+```
+
+```{ojs}
+//| echo: false
 area_muni = FileAttachment("data/area_por_municipio.csv").csv({typed: true})
 ```
 
 ```{ojs}
 //| echo: false
 dept_all = topojson.feature(topo, topo.objects.departamentos)
-mun_all  = topojson.feature(topo, topo.objects.municipios)
+```
 
+```{ojs}
+//| echo: false
+mun_all = topojson.feature(topo, topo.objects.municipios)
+```
+
+```{ojs}
+//| echo: false
 departamentos_cubiertos = new Set(area_muni.map(d => d.departamento))
-area_index = new Map(area_muni.map(d => [`${d.departamento}|${d.municipio}`, d]))
+```
 
+```{ojs}
+//| echo: false
+area_index = new Map(area_muni.map(d => [`${d.departamento}|${d.municipio}`, d]))
+```
+
+```{ojs}
+//| echo: false
 // Departamentos que tocan el conjunto de datos, solo para dibujar el contorno
 // de referencia -- NO se usan para el encuadre (fitExtent), porque algunos
 // (Meta, Caquetá) apenas rozan el borde del área cubierta con <1% de su
@@ -67,7 +85,10 @@ dept = ({
   type: "FeatureCollection",
   features: dept_all.features.filter(f => departamentos_cubiertos.has(f.properties.departamento))
 })
+```
 
+```{ojs}
+//| echo: false
 // Solo los municipios con al menos una edificación detectada -- el encuadre
 // del mapa se ajusta a esto, no a los departamentos completos.
 mun = ({
@@ -79,8 +100,15 @@ mun = ({
 ```{ojs}
 //| echo: false
 area_min = d3.min(area_muni, d => d.area_construida_km2)
-area_max = d3.max(area_muni, d => d.area_construida_km2)
+```
 
+```{ojs}
+//| echo: false
+area_max = d3.max(area_muni, d => d.area_construida_km2)
+```
+
+```{ojs}
+//| echo: false
 color_area = d3.scaleSequentialLog(d3.interpolateRgbBasis(["#eef2f8", "#7f97bb", "#223764"]))
   .domain([area_min, area_max])
 ```
