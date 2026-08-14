@@ -10,6 +10,8 @@ Repo: `github.com/scr-ungrd/exposicion-edificaciones`, publicado en `https://scr
 
 ## Historial: cómo se llegó a esta arquitectura
 
+> **Actualización (2026-08-14):** la opción (A) — el mapa interactivo PMTiles + MapLibre descrito en toda esta sección — se sacó del libro por decisión explícita del usuario ("no aporta al proyecto"). Los archivos (`edificios.pmtiles`, `generar_pmtiles.sh`, `libs/maplibre-gl.*`, `libs/pmtiles.js`) viven ahora en `../pmtiles-reducido/` (ver su propio `CLAUDE.md`), fuera de este repo. Esta sección se conserva íntegra porque documenta un proceso reproducible (cómo bajar un `.pmtiles` de 410 MB a <100 MB) que sigue siendo la referencia a usar si se repite en otro proyecto — no porque siga aplicando aquí. El libro actual solo usa la opción (B) más el análisis de área construida por municipio (ver `## Datos fuente` abajo).
+
 Punto de partida: un shapefile de edificaciones de Google Open Buildings (vía GEE) en `../Edificios_GEE_Shp/Buildings.shp` — 1.1 GB, 6.038.048 polígonos. No se puede desplegar tal cual en un libro/sitio Quarto (ni el navegador ni GitHub lo aguantan). Se evaluaron tres formas de representarlo:
 
 - **(A) Mapa interactivo** — vector tiles (PMTiles) + MapLibre GL, huellas de edificación individuales, zoom libre.
@@ -40,12 +42,12 @@ Resultado: `data/edificios.pmtiles` (37.7 MB) sí está en git (excepción en `.
 
 ## Datos fuente
 
-Los datos crudos de edificaciones (huellas de Google Open Buildings vía GEE, shapefile de ~1.1 GB / 6M polígonos) viven en `../Edificios_GEE_Shp/` (un nivel arriba, fuera de este proyecto Quarto — no se copian aquí por su tamaño). A partir de ahí, el capítulo `02-mapa-exposicion.qmd` incluye dos mapas:
+Los datos crudos de edificaciones (huellas de Google Open Buildings vía GEE, shapefile de ~1.1 GB / 6M polígonos) viven en `../Edificios_GEE_Shp/` (un nivel arriba, fuera de este proyecto Quarto — no se copian aquí por su tamaño). A partir de ahí, el capítulo `02-mapa-exposicion.qmd` incluye:
 
 1. **Mapa estático agregado** (imagen): polígonos agregados a una grilla de 2×2 km (conteo por celda), generada con `data/agregar_exposicion.py` + `data/graficar_mapa.py` → `media/02-mapa-exposicion/densidad_edificaciones.png`.
-2. **Mapa interactivo** (MapLibre GL + PMTiles): huellas de edificación individuales, vector tiles generados con `data/generar_pmtiles.sh` (usa `ogr2ogr` + `tippecanoe`) → `data/edificios.pmtiles`. Librerías locales (sin CDN) en `libs/` (`maplibre-gl.js/css`, `pmtiles.js`) — **`libs/` sí está en git** (a diferencia de `data/`), porque el capítulo las necesita en producción.
+2. **Área construida por municipio** (tabla + mapa D3/OJS interactivo): `data/agregar_por_municipio.py` une el centroide de cada edificación contra los límites municipales (`shapely.STRtree`, streaming) y suma `area_m2` por municipio → `data/area_por_municipio.csv`. El mapa coroplético interactivo vive directamente en `02-mapa-exposicion.qmd` como celdas `{ojs}` (D3 + TopoJSON, sin librerías externas — Quarto inyecta `d3`/`topojson`/`Inputs` automáticamente en el motor OJS), usando `data/colombia_moderate.topojson` (límites de municipios/departamentos, mismo origen GADM v4.1 que `col_municipios.geojson`) filtrado a los departamentos con datos. Colorea por `area_construida_km2` (escala log, misma rampa azul UNGRD) y el tooltip muestra edificios + área construida por municipio. Referencia de la que se adaptó el patrón D3/OJS: `../Fichas-departamentales/fichas-departamentales-figuras/fichas-departamentales-objetos.qmd`.
 
-Los scripts (`*.py`, `*.sh`) y `data/edificios.pmtiles` **sí están en git** (excepciones explícitas en `.gitignore`, con `data/*` como regla base). Las salidas intermedias regenerables (`data/grilla_exposicion.npz`) siguen ignoradas.
+Los scripts (`*.py`, `*.sh`), `data/area_por_municipio.csv` y `data/colombia_moderate.topojson` **sí están en git** (excepciones explícitas en `.gitignore`, con `data/*` como regla base). Las salidas intermedias regenerables (`data/grilla_exposicion.npz`) siguen ignoradas.
 
 **Dependencias a tener en cuenta si se reutilizan estos scripts:**
 - `agregar_exposicion.py` tiene hardcodeado `BBOX_WGS84` (extent del shapefile actual, obtenido con `ogrinfo`) y rutas absolutas — para un dataset/región nueva hay que recalcular el bbox y actualizar las rutas.
@@ -62,22 +64,9 @@ Los scripts (`*.py`, `*.sh`) y `data/edificios.pmtiles` **sí están en git** (e
 7. Agregar el `.pmtiles` a `project.resources` en `_quarto.yml` — sin esto, Quarto no lo copia a `_book/` (ni local ni en CI) porque solo se referencia desde JS, no desde un link/img estático. El síntoma es engañoso: todo renderiza sin error y la Action de despliegue queda en verde, pero el mapa no carga ningún edificio.
 8. **Después de desplegar, verificar con `curl -I https://.../data/tu-archivo.pmtiles` que responda `200`, no `404`.** Un despliegue exitoso (Action en verde) no significa que el `.pmtiles` haya llegado al sitio — hay que comprobarlo aparte.
 
-### `data/edificios.pmtiles` (37.7 MB) — sí está en git, no necesita hosting externo
+### Recursos estáticos referenciados solo desde código (JS/OJS) — declararlos en `resources:`
 
-Con los parámetros por defecto de tippecanoe (`-zg --extend-zooms-if-still-dropping`), el archivo se extendía a maxzoom 15 y pesaba 410 MB — superaba el límite de 100 MB de GitHub, y ni Git LFS (GitHub Pages no sirve archivos LFS) ni GitHub Releases (soporta Range Requests pero no envía cabeceras CORS, verificado empíricamente) servían como alternativa. La solución fue fijar `-Z0 -z13` en `data/generar_pmtiles.sh` (maxzoom fijo en 13, sin extender): el archivo baja a 37.7 MB — el navegador hace overzoom más allá de 13 sin pérdida perceptible de nitidez en los polígonos individuales (verificado visualmente hasta zoom 18). Filtrar por `confiab` no fue necesario (bajar el zoom fue suficiente).
-
-Regenerar con `bash data/generar_pmtiles.sh` — toma ~15 min en esta máquina (8 GB RAM), la mayor parte en la fase de tiling de zoom 13.
-
-### Preview local del mapa interactivo — usar `npx serve`, no `quarto preview`
-
-El servidor de `quarto preview` no soporta HTTP Range Requests (responde `200` completo en vez de `206` parcial), que es lo que PMTiles necesita. Con `quarto preview` el mapa se queda cargando para siempre. Usar en su lugar:
-
-```bash
-quarto render      # genera _book/, incluyendo data/edificios.pmtiles (ver nota resources: abajo)
-npx serve _book     # sirve con soporte real de Range Requests
-```
-
-**`resources:` en `_quarto.yml` es obligatorio para que esto funcione, tanto local como en la Action de CI.** Quarto no detecta automáticamente `data/edificios.pmtiles` como recurso a copiar a `_book/` porque solo se referencia desde una URL armada en JS (`fetch` de PMTiles.js dentro de un `<script>`), no como un link/img estático que Quarto pueda rastrear. Sin la entrada `resources: [data/edificios.pmtiles]` en `_quarto.yml`, el render "funciona" (no da error) pero el archivo simplemente no llega a `_book/data/` — **y esto se detectó tarde, después de dar por bueno el despliegue**: la Action corría en verde y el sitio se veía bien en general, pero el `.pmtiles` devolvía 404 y el mapa interactivo no cargaba ningún edificio al hacer zoom. Verificar siempre con `curl -I https://scr-ungrd.github.io/exposicion-edificaciones/data/edificios.pmtiles` (debe dar `200`, no `404`) después de cualquier cambio a `_quarto.yml`, `.gitignore` o el pipeline de generación del `.pmtiles` — un workflow en verde no garantiza que los recursos estáticos referenciados solo desde JS hayan llegado al sitio.
+Lección general (ya no aplica al `.pmtiles`, que se sacó del repo, pero sigue aplicando a `data/area_por_municipio.csv` y `data/colombia_moderate.topojson`, que si están vigentes): Quarto no detecta automáticamente como recurso a copiar a `_book/` un archivo que solo se referencia desde una URL armada en JS/OJS (`FileAttachment(...)`, `fetch(...)`), a diferencia de un link/img estático que sí puede rastrear. Hay que declararlo explícitamente en `project.resources` en `_quarto.yml` — si no, el render "funciona" (no da error) pero el archivo no llega a `_book/`, la Action de CI queda en verde, y el síntoma solo aparece en el navegador (datos/mapa vacíos). **Después de cualquier cambio a `_quarto.yml`, `.gitignore` o los datos de un mapa OJS, verificar con `curl -I https://.../data/archivo` que responda `200`, no `404`** — un despliegue en verde no lo garantiza.
 
 ## Comandos
 

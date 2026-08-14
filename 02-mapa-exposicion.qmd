@@ -42,182 +42,163 @@ Los 20 municipios con mayor área construida:
 
 El listado completo (473 municipios) está disponible para descarga: [`area_por_municipio.csv`](data/area_por_municipio.csv).
 
-![Área construida por municipio](media/02-mapa-exposicion/area_por_municipio.png){#fig-area-municipios}
+Mapa interactivo — solo se muestran los departamentos con al menos un municipio con edificaciones detectadas; pasa el cursor sobre un municipio para ver el número de edificios y el área construida.
 
-# Mapa Interactivo de Exposición de Edificaciones
-
-Huellas de construcción · PMTiles + MapLibre GL · Fuente: Google Open Buildings (GEE)
-
-```{=html}
-<!-- ── Dependencias MapLibre GL + PMTiles (locales) ────────────────────── -->
-<link  href="libs/maplibre-gl.css" rel="stylesheet">
-<script src="libs/maplibre-gl.js"></script>
-<script src="libs/pmtiles.js"></script>
-
-<style>
-  #map-edificios {
-    width: 100%;
-    height: 78vh;
-    border-radius: 10px;
-    border: 1px solid #c8d6df;
-  }
-
-  #map-info {
-    background: rgba(34, 55, 100, 0.88);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 0 0 10px 10px;
-    font-size: 12px;
-    font-family: system-ui, sans-serif;
-    min-height: 28px;
-  }
-
-  .layer-toggle {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: white;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-family: system-ui, sans-serif;
-    font-size: 13px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    z-index: 10;
-    line-height: 1.8;
-  }
-  .layer-toggle b { color: #223764; }
-</style>
-
-<div style="position:relative;">
-  <div id="map-edificios"></div>
-
-  <div class="layer-toggle">
-    <b style="display:block;margin-bottom:4px;">Color por</b>
-    <label><input type="radio" name="colorMode" value="area" checked> Área construida</label><br>
-    <label><input type="radio" name="colorMode" value="confiab"> Confianza de detección</label>
-  </div>
-</div>
-
-<div id="map-info">Edificaciones · Fuente: Google Open Buildings vía Google Earth Engine</div>
-
-<script>
-(function () {
-  // ── 1. Registrar protocolo PMTiles ANTES de crear el mapa ──────────────
-  const protocol = new pmtiles.Protocol();
-  maplibregl.addProtocol("pmtiles", protocol.tile.bind(protocol));
-
-  const pmtilesUrl = "pmtiles://" + new URL("data/edificios.pmtiles", window.location.href).href;
-
-  // ── 2. Inicializar mapa con basemap CartoDB Positron ─────────────────────
-  const map = new maplibregl.Map({
-    container: "map-edificios",
-    style: {
-      version: 8,
-      sources: {
-        "carto-light": {
-          type: "raster",
-          tiles: [
-            "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-            "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
-          ],
-          tileSize: 256,
-          attribution: "© <a href='https://carto.com/'>CartoDB</a> © <a href='https://openstreetmap.org'>OSM</a>"
-        }
-      },
-      layers: [
-        { id: "basemap", type: "raster", source: "carto-light" }
-      ]
-    },
-    center: [-75.9, 4.4],
-    zoom: 7,
-    minZoom: 4,
-    maxZoom: 18
-  });
-
-  map.addControl(new maplibregl.NavigationControl(), "top-left");
-  map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
-
-  map.on("error", (e) => console.error("[MapLibre]", e.error));
-
-  const FILL_AREA = [
-    "interpolate", ["linear"], ["get", "area_m2"],
-    20, "#a8bad6",
-    60, "#7f97bb",
-    150, "#5674a8",
-    500, "#223764"
-  ];
-  const FILL_CONFIAB = [
-    "interpolate", ["linear"], ["get", "confiab"],
-    0.6, "#a8bad6",
-    0.75, "#7f97bb",
-    0.85, "#5674a8",
-    1.0, "#223764"
-  ];
-
-  map.on("load", () => {
-    map.addSource("edificios", {
-      type: "vector",
-      url: pmtilesUrl
-    });
-
-    map.addLayer({
-      id: "edificios-fill",
-      type: "fill",
-      source: "edificios",
-      "source-layer": "edificios",
-      paint: {
-        "fill-color": FILL_AREA,
-        "fill-opacity": 0.55
-      }
-    });
-
-    map.addLayer({
-      id: "edificios-line",
-      type: "line",
-      source: "edificios",
-      "source-layer": "edificios",
-      minzoom: 13,
-      paint: {
-        "line-color": "#223764",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.3, 17, 1],
-        "line-opacity": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 16, 0.75]
-      }
-    });
-
-    document.querySelectorAll('input[name="colorMode"]').forEach((radio) => {
-      radio.addEventListener("change", (e) => {
-        const expr = e.target.value === "area" ? FILL_AREA : FILL_CONFIAB;
-        map.setPaintProperty("edificios-fill", "fill-color", expr);
-      });
-    });
-  });
-
-  // ── 3. Popup al hacer clic ──────────────────────────────────────────────
-  const popup = new maplibregl.Popup({ closeButton: false, maxWidth: "220px" });
-
-  map.on("click", "edificios-fill", (e) => {
-    if (!e.features.length) return;
-    const p = e.features[0].properties;
-    popup
-      .setLngLat(e.lngLat)
-      .setHTML(
-        `<b style="font-size:13px">Edificación</b>
-         <br><span style="font-size:11px;color:#555">Área: ${Number(p.area_m2).toFixed(1)} m²</span>
-         <br><span style="font-size:11px;color:#555">Confianza: ${Number(p.confiab).toFixed(2)}</span>`
-      )
-      .addTo(map);
-  });
-
-  map.on("mouseenter", "edificios-fill", () => { map.getCanvas().style.cursor = "pointer"; });
-  map.on("mouseleave", "edificios-fill", () => { map.getCanvas().style.cursor = ""; });
-
-})();
-</script>
+```{ojs}
+//| echo: false
+topo = FileAttachment("data/colombia_moderate.topojson").json()
+area_muni = FileAttachment("data/area_por_municipio.csv").csv({typed: true})
 ```
 
-> **Nota metodológica:** Las huellas de edificaciones provienen del conjunto de datos [Open Buildings](https://sites.research.google/open-buildings/) de Google, obtenidas vía Google Earth Engine y convertidas al formato [PMTiles](https://docs.protomaps.com) con [tippecanoe](https://github.com/felt/tippecanoe) para distribución eficiente vía HTTP Range Requests. Los tiles se generan hasta zoom 13 (el navegador amplía automáticamente más allá de ese nivel); esto mantiene el archivo en 37.7 MB, dentro del límite de tamaño de GitHub, sin pérdida perceptible de nitidez en los polígonos individuales. La cobertura actual corresponde al corredor andino suroccidental de Colombia (no a la totalidad del territorio nacional).
+```{ojs}
+//| echo: false
+dept_all = topojson.feature(topo, topo.objects.departamentos)
+mun_all  = topojson.feature(topo, topo.objects.municipios)
 
-<!-- Nota: data/edificios.pmtiles (37.7 MB, maxzoom=13) sí está en git — cabe bajo el límite de
-     100 MB de GitHub sin necesitar hosting externo. Localmente solo funciona con `npx serve`
-     (no con `quarto preview`, que no soporta Range Requests). Ver data/generar_pmtiles.sh
-     para regenerarlo. -->
+departamentos_cubiertos = new Set(area_muni.map(d => d.departamento))
+area_index = new Map(area_muni.map(d => [`${d.departamento}|${d.municipio}`, d]))
+
+// Departamentos que tocan el conjunto de datos, solo para dibujar el contorno
+// de referencia -- NO se usan para el encuadre (fitExtent), porque algunos
+// (Meta, Caquetá) apenas rozan el borde del área cubierta con <1% de su
+// territorio y son enormes: si se usa su extensión completa para el zoom,
+// aplastan la región realmente relevante en una esquina del mapa.
+dept = ({
+  type: "FeatureCollection",
+  features: dept_all.features.filter(f => departamentos_cubiertos.has(f.properties.departamento))
+})
+
+// Solo los municipios con al menos una edificación detectada -- el encuadre
+// del mapa se ajusta a esto, no a los departamentos completos.
+mun = ({
+  type: "FeatureCollection",
+  features: mun_all.features.filter(f => area_index.has(`${f.properties.departamento}|${f.properties.municipio}`))
+})
+```
+
+```{ojs}
+//| echo: false
+area_min = d3.min(area_muni, d => d.area_construida_km2)
+area_max = d3.max(area_muni, d => d.area_construida_km2)
+
+color_area = d3.scaleSequentialLog(d3.interpolateRgbBasis(["#eef2f8", "#7f97bb", "#223764"]))
+  .domain([area_min, area_max])
+```
+
+```{ojs}
+//| echo: false
+{
+  const width = 700
+  const height = 880
+
+  const container = d3.create("div")
+    .style("position", "relative")
+    .style("font-family", "system-ui, sans-serif")
+
+  const svg = container.append("svg")
+    .attr("width", "100%")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .style("background", "#ffffff")
+
+  const projection = d3.geoMercator()
+    .fitExtent([[10, 10], [width - 10, height - 70]], mun)
+
+  const path = d3.geoPath().projection(projection)
+
+  const tooltip = container.append("div")
+    .style("position", "absolute")
+    .style("pointer-events", "none")
+    .style("background", "rgba(34,55,100,0.92)")
+    .style("color", "white")
+    .style("padding", "6px 10px")
+    .style("border-radius", "6px")
+    .style("font-size", "12px")
+    .style("line-height", "1.5")
+    .style("display", "none")
+    .style("z-index", 10)
+
+  svg.append("g")
+    .selectAll("path")
+    .data(mun.features)
+    .join("path")
+      .attr("d", path)
+      .attr("fill", d => {
+        const info = area_index.get(`${d.properties.departamento}|${d.properties.municipio}`)
+        return info ? color_area(info.area_construida_km2) : "#f7f8fa"
+      })
+      .attr("stroke", "#ffffff")
+      .attr("stroke-width", 0.3)
+    .on("mouseover", function (event, d) {
+      d3.select(this).attr("stroke", "#223764").attr("stroke-width", 1.3)
+      const info = area_index.get(`${d.properties.departamento}|${d.properties.municipio}`)
+      tooltip.style("display", "block").html(
+        info
+          ? `<b>${d.properties.municipio}</b><br>
+             <span style="font-size:10px;opacity:.85">${d.properties.departamento}</span><br>
+             Edificios: ${info.n_edificios.toLocaleString("es-CO")}<br>
+             Área construida: ${info.area_construida_km2.toFixed(2)} km²`
+          : `<b>${d.properties.municipio}</b><br>
+             <span style="font-size:10px;opacity:.85">${d.properties.departamento}</span><br>
+             Sin edificaciones detectadas`
+      )
+    })
+    .on("mousemove", function (event) {
+      const [mx, my] = d3.pointer(event, container.node())
+      tooltip.style("left", (mx + 12) + "px").style("top", (my - 44) + "px")
+    })
+    .on("mouseout", function () {
+      d3.select(this).attr("stroke", "#ffffff").attr("stroke-width", 0.3)
+      tooltip.style("display", "none")
+    })
+
+  svg.append("g")
+    .selectAll("path")
+    .data(dept.features)
+    .join("path")
+      .attr("d", path)
+      .attr("fill", "none")
+      .attr("stroke", "#9aa5b1")
+      .attr("stroke-width", 0.7)
+
+  // Leyenda: gradiente horizontal en escala log
+  const legendWidth = 260
+  const legendHeight = 10
+  const legendX = (width - legendWidth) / 2
+  const legendY = height - 45
+
+  const gradient = svg.append("defs")
+    .append("linearGradient")
+      .attr("id", "grad-area-municipios")
+      .attr("x1", "0%").attr("x2", "100%")
+
+  d3.range(0, 1.001, 0.1).forEach(t => {
+    gradient.append("stop")
+      .attr("offset", `${t * 100}%`)
+      .attr("stop-color", color_area(area_min * Math.pow(area_max / area_min, t)))
+  })
+
+  svg.append("rect")
+    .attr("x", legendX).attr("y", legendY)
+    .attr("width", legendWidth).attr("height", legendHeight)
+    .style("fill", "url(#grad-area-municipios)")
+
+  const legendScale = d3.scaleLog().domain([area_min, area_max]).range([legendX, legendX + legendWidth])
+
+  svg.append("g")
+    .attr("transform", `translate(0, ${legendY + legendHeight})`)
+    .call(d3.axisBottom(legendScale).ticks(4, ".2~f"))
+    .call(g => g.select(".domain").remove())
+    .selectAll("text").style("font-size", "9px")
+
+  svg.append("text")
+    .attr("x", width / 2).attr("y", legendY - 6)
+    .attr("text-anchor", "middle")
+    .style("font-size", "10px")
+    .style("fill", "#333")
+    .text("Área construida por municipio (km², escala log)")
+
+  return container.node()
+}
+```
+
+Solo se dibujan los municipios con al menos una edificación detectada; el contorno gris de fondo corresponde a los departamentos que tocan el área cubierta (incluye zonas sin municipios coloreados, donde el conjunto de datos no llega). Fuente de límites municipales: IGAC / GADM v4.1.

@@ -1,13 +1,9 @@
 project:
   type: book
   output-dir: _book
-  # Quarto no detecta automáticamente el .pmtiles porque solo se referencia
-  # desde una URL armada en JS (fetch de PMTiles.js), no como un recurso
-  # estático normal (img src, link href, etc.) -- hay que declararlo a mano
-  # para que se copie a _book/ al renderizar (local y en la Action de CI).
   resources:
-    - data/edificios.pmtiles
     - data/area_por_municipio.csv
+    - data/colombia_moderate.topojson
 
 book:
   title: "Exposición de edificaciones sismo de San José del Palmar"
