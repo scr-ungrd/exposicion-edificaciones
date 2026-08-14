@@ -59,6 +59,8 @@ Los scripts (`*.py`, `*.sh`) y `data/edificios.pmtiles` **sí están en git** (e
 4. **No juzgar el tamaño mientras tippecanoe corre** — el archivo intermedio durante la fase de tiling puede verse 3× más grande que el resultado final compactado (ver ejemplo real en la sección de Historial arriba).
 5. Verificar visualmente antes de dar por bueno el recorte de zoom: `npx serve` + zoom hasta el máximo del mapa (más allá del maxzoom real, para probar el *overzoom* del navegador) y confirmar que los polígonos individuales se sigan viendo nítidos.
 6. Confirmar que `data/*.pmtiles` (o el nombre que uses) queda excluido de la regla general `data/*` en `.gitignore` con un `!data/tu-archivo.pmtiles`, y que los scripts (`*.py`/`*.sh`) también quedan versionados — si no, la próxima persona (o vos mismo) no podrá reproducir el proceso desde un clon limpio.
+7. Agregar el `.pmtiles` a `project.resources` en `_quarto.yml` — sin esto, Quarto no lo copia a `_book/` (ni local ni en CI) porque solo se referencia desde JS, no desde un link/img estático. El síntoma es engañoso: todo renderiza sin error y la Action de despliegue queda en verde, pero el mapa no carga ningún edificio.
+8. **Después de desplegar, verificar con `curl -I https://.../data/tu-archivo.pmtiles` que responda `200`, no `404`.** Un despliegue exitoso (Action en verde) no significa que el `.pmtiles` haya llegado al sitio — hay que comprobarlo aparte.
 
 ### `data/edificios.pmtiles` (37.7 MB) — sí está en git, no necesita hosting externo
 
@@ -71,10 +73,11 @@ Regenerar con `bash data/generar_pmtiles.sh` — toma ~15 min en esta máquina (
 El servidor de `quarto preview` no soporta HTTP Range Requests (responde `200` completo en vez de `206` parcial), que es lo que PMTiles necesita. Con `quarto preview` el mapa se queda cargando para siempre. Usar en su lugar:
 
 ```bash
-quarto render                                    # genera _book/
-cp data/edificios.pmtiles _book/data/edificios.pmtiles  # el render no copia data/ (está en .gitignore)
-npx serve _book                                  # sirve con soporte real de Range Requests
+quarto render      # genera _book/, incluyendo data/edificios.pmtiles (ver nota resources: abajo)
+npx serve _book     # sirve con soporte real de Range Requests
 ```
+
+**`resources:` en `_quarto.yml` es obligatorio para que esto funcione, tanto local como en la Action de CI.** Quarto no detecta automáticamente `data/edificios.pmtiles` como recurso a copiar a `_book/` porque solo se referencia desde una URL armada en JS (`fetch` de PMTiles.js dentro de un `<script>`), no como un link/img estático que Quarto pueda rastrear. Sin la entrada `resources: [data/edificios.pmtiles]` en `_quarto.yml`, el render "funciona" (no da error) pero el archivo simplemente no llega a `_book/data/` — **y esto se detectó tarde, después de dar por bueno el despliegue**: la Action corría en verde y el sitio se veía bien en general, pero el `.pmtiles` devolvía 404 y el mapa interactivo no cargaba ningún edificio al hacer zoom. Verificar siempre con `curl -I https://scr-ungrd.github.io/exposicion-edificaciones/data/edificios.pmtiles` (debe dar `200`, no `404`) después de cualquier cambio a `_quarto.yml`, `.gitignore` o el pipeline de generación del `.pmtiles` — un workflow en verde no garantiza que los recursos estáticos referenciados solo desde JS hayan llegado al sitio.
 
 ## Comandos
 
