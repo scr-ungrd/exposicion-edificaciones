@@ -82,9 +82,9 @@ quarto render           # compila el sitio HTML estático a _book/
 quarto render --to pdf  # compila la versión PDF (requiere motor LaTeX, p.ej. TinyTeX)
 ```
 
-## Capítulo 3: Viviendas afectadas
+## Capítulo "Viviendas afectadas": movido a otro repo
 
-`03-viviendas-afectadas.qmd` — tabla + mapa D3/OJS (coroplético, Valle del Cauca, con nombre de cada municipio siempre visible) + gráfico de barras (Observable Plot) del `% de viviendas afectadas`. Fuente: `~/Downloads/VIVIENDAS AFECTADAS ANALISIS.xlsx` (fuera de este repo), limpiado y con nombres de municipio normalizados (el Excel no trae tildes) por `data/procesar_viviendas_afectadas.py` → `data/viviendas_afectadas_valle.csv`. El Excel original no incluye a Santiago de Cali (se muestra en gris en el mapa, no es un bug). Cada celda `{ojs}` de este capítulo se escribió desde el inicio como una declaración por celda (ver bug de subfiguras arriba).
+> **Actualización (2026-08-14):** el capítulo de viviendas afectadas (tabla + mapa D3/OJS coroplético del Valle del Cauca + gráfico de barras del `% de viviendas afectadas`, fuente `VIVIENDAS AFECTADAS ANALISIS.xlsx`) se retiró por completo de este libro y ahora es el capítulo 1 de un libro propio: `github.com/scr-ungrd/viviendas-afectadas` (`https://scr-ungrd.github.io/viviendas-afectadas/`). Se movieron junto con él `data/procesar_viviendas_afectadas.py` y `data/viviendas_afectadas_valle.csv`; `data/colombia_moderate.topojson` se copió (no se movió) porque el capítulo 2 de este libro lo sigue usando. El bug de subfiguras OJS documentado arriba también aplica en el repo nuevo (mismo patrón de una declaración por celda).
 
 ## Pendientes conocidos (marcados como TODO en los .qmd)
 
@@ -100,5 +100,5 @@ El orden y la lista de capítulos viven en `_quarto.yml` (`book.chapters`):
 
 ```
 index.qmd → Pagina-legal.qmd → presentacion.qmd → 01-metodologia.qmd →
-02-mapa-exposicion.qmd → 03-viviendas-afectadas.qmd → 04-referencias-bibliograficas.qmd
+02-mapa-exposicion.qmd → 03-referencias-bibliograficas.qmd
 ```

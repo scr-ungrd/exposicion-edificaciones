@@ -25,10 +25,4 @@ Scripts de procesamiento (en `data/`, versionados en git — solo las salidas in
 
 ## Mapas interactivos (D3 + Observable JS)
 
-Los mapas coropléticos interactivos de los capítulos 2 y 3 se construyen con celdas `{ojs}` (D3 + TopoJSON) directamente en el `.qmd`, sobre `data/colombia_moderate.topojson` (límites de municipios/departamentos, IGAC/GADM v4.1). **Cada celda `{ojs}` debe tener una sola declaración top-level** — con varias declaraciones en un mismo bloque, este proyecto (`type: book`) falla silenciosamente sin cargar los datos (detalle técnico documentado en `CLAUDE.md`).
-
-## Fuente de datos: viviendas afectadas (capítulo 3)
-
-El insumo es `VIVIENDAS AFECTADAS ANALISIS.xlsx` (fuera de este repo), con el inventario de vivienda unifamiliar y el conteo de viviendas afectadas por municipio del Valle del Cauca. `data/procesar_viviendas_afectadas.py` limpia el archivo (descarta una fila de nota al pie) y normaliza los nombres de municipio — el Excel original no trae tildes — contra la misma fuente oficial de límites municipales usada en el capítulo 2. El archivo no incluye a Santiago de Cali.
-
-<!-- TODO: precisar la fuente y el evento/fecha de origen de VIVIENDAS AFECTADAS ANALISIS.xlsx -->
+El mapa coroplético interactivo del capítulo 2 se construye con celdas `{ojs}` (D3 + TopoJSON) directamente en el `.qmd`, sobre `data/colombia_moderate.topojson` (límites de municipios/departamentos, IGAC/GADM v4.1). **Cada celda `{ojs}` debe tener una sola declaración top-level** — con varias declaraciones en un mismo bloque, este proyecto (`type: book`) falla silenciosamente sin cargar los datos (detalle técnico documentado en `CLAUDE.md`).

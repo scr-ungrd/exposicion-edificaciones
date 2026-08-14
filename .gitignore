@@ -13,7 +13,6 @@ data/*
 !data/*.sh
 !data/area_por_municipio.csv
 !data/colombia_moderate.topojson
-!data/viviendas_afectadas_valle.csv
 
 # Archivos y carpetas generadas automáticamente por Quarto
 _book/
