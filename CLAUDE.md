@@ -15,11 +15,13 @@ Los datos crudos de edificaciones (huellas de Google Open Buildings vía GEE, sh
 1. **Mapa estático agregado** (imagen): polígonos agregados a una grilla de 2×2 km (conteo por celda), generada con `data/agregar_exposicion.py` + `data/graficar_mapa.py` → `media/02-mapa-exposicion/densidad_edificaciones.png`.
 2. **Mapa interactivo** (MapLibre GL + PMTiles): huellas de edificación individuales, vector tiles generados con `data/generar_pmtiles.sh` (usa `ogr2ogr` + `tippecanoe`) → `data/edificios.pmtiles`. Librerías locales (sin CDN) en `libs/` (`maplibre-gl.js/css`, `pmtiles.js`) — **`libs/` sí está en git** (a diferencia de `data/`), porque el capítulo las necesita en producción.
 
-Los scripts de procesamiento y salidas intermedias van en `data/` (en `.gitignore`, siguiendo la misma convención que el resto de libros SCR).
+Los scripts de procesamiento y salidas intermedias van en `data/` (en `.gitignore`, siguiendo la misma convención que el resto de libros SCR) — **excepto `data/edificios.pmtiles`, que sí está en git** (ver nota abajo).
 
-### `data/edificios.pmtiles` (410 MB) — no está en git, y por ahora el mapa interactivo no funciona en el sitio publicado
+### `data/edificios.pmtiles` (37.7 MB) — sí está en git, no necesita hosting externo
 
-Este archivo supera el límite de 100 MB de GitHub y no puede resolverse con Git LFS (GitHub Pages no sirve archivos LFS — confirmado en la documentación oficial) ni con GitHub Releases (sí soporta Range Requests, pero no envía cabeceras CORS, así que el `fetch()` de PMTiles.js falla igual desde otro origen — verificado empíricamente). **Pendiente**: subir `edificios.pmtiles` a un bucket externo con Range Requests + CORS habilitados (p. ej. Google Cloud Storage) y apuntar `pmtilesUrl` en `02-mapa-exposicion.qmd` allá en vez de a `data/edificios.pmtiles` local. Hasta que eso se resuelva, el mapa interactivo solo funciona en preview local.
+Con los parámetros por defecto de tippecanoe (`-zg --extend-zooms-if-still-dropping`), el archivo se extendía a maxzoom 15 y pesaba 410 MB — superaba el límite de 100 MB de GitHub, y ni Git LFS (GitHub Pages no sirve archivos LFS) ni GitHub Releases (soporta Range Requests pero no envía cabeceras CORS, verificado empíricamente) servían como alternativa. La solución fue fijar `-Z0 -z13` en `data/generar_pmtiles.sh` (maxzoom fijo en 13, sin extender): el archivo baja a 37.7 MB — el navegador hace overzoom más allá de 13 sin pérdida perceptible de nitidez en los polígonos individuales (verificado visualmente hasta zoom 18). Filtrar por `confiab` no fue necesario (bajar el zoom fue suficiente).
+
+Regenerar con `bash data/generar_pmtiles.sh` — toma ~15 min en esta máquina (8 GB RAM), la mayor parte en la fase de tiling de zoom 13.
 
 ### Preview local del mapa interactivo — usar `npx serve`, no `quarto preview`
 
@@ -44,7 +46,6 @@ quarto render --to pdf  # compila la versión PDF (requiere motor LaTeX, p.ej. T
 - Portada propia (actualmente usa el logo genérico UNGRD en vez de un cubo/portada dedicada).
 - Texto de `presentacion.qmd`.
 - DOI y metadatos definitivos en `Pagina-legal.qmd` (actualmente placeholders `PENDIENTE`).
-- Hospedar `data/edificios.pmtiles` externamente para que el mapa interactivo funcione en el sitio publicado (ver sección de datos arriba).
 - El dataset cubre el corredor andino suroccidental de Colombia, no la totalidad del territorio nacional — ajustar alcance/título si se espera cobertura nacional.
 
 ## Estructura y orden de capítulos

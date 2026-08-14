@@ -5,7 +5,10 @@ separador.py
 requirements.txt
 
 # Documentos originales
-data/
+data/*
+# ...excepto el pmtiles del mapa interactivo (37.7 MB, cabe bajo el límite de GitHub
+# y el capítulo lo necesita en producción)
+!data/edificios.pmtiles
 
 # Archivos y carpetas generadas automáticamente por Quarto
 _book/

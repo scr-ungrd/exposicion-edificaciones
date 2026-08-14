@@ -180,10 +180,9 @@ Huellas de construcción · PMTiles + MapLibre GL · Fuente: Google Open Buildin
 </script>
 ```
 
-> **Nota metodológica:** Las huellas de edificaciones provienen del conjunto de datos [Open Buildings](https://sites.research.google/open-buildings/) de Google, obtenidas vía Google Earth Engine y convertidas al formato [PMTiles](https://docs.protomaps.com) con [tippecanoe](https://github.com/felt/tippecanoe) para distribución eficiente vía HTTP Range Requests. La cobertura actual corresponde al corredor andino suroccidental de Colombia (no a la totalidad del territorio nacional).
+> **Nota metodológica:** Las huellas de edificaciones provienen del conjunto de datos [Open Buildings](https://sites.research.google/open-buildings/) de Google, obtenidas vía Google Earth Engine y convertidas al formato [PMTiles](https://docs.protomaps.com) con [tippecanoe](https://github.com/felt/tippecanoe) para distribución eficiente vía HTTP Range Requests. Los tiles se generan hasta zoom 13 (el navegador amplía automáticamente más allá de ese nivel); esto mantiene el archivo en 37.7 MB, dentro del límite de tamaño de GitHub, sin pérdida perceptible de nitidez en los polígonos individuales. La cobertura actual corresponde al corredor andino suroccidental de Colombia (no a la totalidad del territorio nacional).
 
-<!-- TODO: data/edificios.pmtiles (410 MB) no está en git (supera el límite de 100 MB de GitHub
-     y GitHub Pages no sirve archivos LFS). Para que este mapa funcione en el sitio publicado,
-     hay que subir el archivo a un host externo con Range Requests + CORS (p.ej. Google Cloud
-     Storage) y apuntar `pmtilesUrl` allá. Localmente solo funciona con `npx serve` (no con
-     `quarto preview`, que no soporta Range Requests). Ver data/generar_pmtiles.sh para regenerarlo. -->
+<!-- Nota: data/edificios.pmtiles (37.7 MB, maxzoom=13) sí está en git — cabe bajo el límite de
+     100 MB de GitHub sin necesitar hosting externo. Localmente solo funciona con `npx serve`
+     (no con `quarto preview`, que no soporta Range Requests). Ver data/generar_pmtiles.sh
+     para regenerarlo. -->
