@@ -1,6 +1,6 @@
 # Inicio
 
-Bienvenidos al libro digital **Exposición de edificaciones en Colombia**. Este recurso ha sido diseñado por la Unidad Nacional para la Gestión del Riesgo de Desastres (UNGRD) para caracterizar la distribución espacial de las edificaciones en el territorio nacional como insumo para el análisis de exposición ante amenazas naturales.
+**Exposición de edificaciones sismo de San José del Palmar**. Este recurso fue diseñado por la Unidad Nacional para la Gestión del Riesgo de Desastres (UNGRD) para caracterizar la distribución espacial de las edificaciones en el territorio nacional como insumo para el análisis de exposición y daños para el sismo de San José del Palmar.
 
 <!-- TODO: reemplazar por una portada propia con {.ungrd-cover-float}, siguiendo el ejemplo de otros libros SCR -->
 
@@ -17,7 +17,7 @@ Bienvenidos al libro digital **Exposición de edificaciones en Colombia**. Este 
 
 ::: {.ungrd-card}
 ::: {.ungrd-card-header}
-[Capítulo 2: Metodología](02-metodologia.html)
+[1: Metodología](01-metodologia.html)
 :::
 ::: {.ungrd-card-body}
 Fuente de datos (Google Open Buildings vía Google Earth Engine) y procesamiento realizado para transformar los polígonos de edificaciones en indicadores agregados de exposición.
@@ -26,7 +26,7 @@ Fuente de datos (Google Open Buildings vía Google Earth Engine) y procesamiento
 
 ::: {.ungrd-card}
 ::: {.ungrd-card-header}
-[Capítulo 3: Mapa de exposición de edificaciones](03-mapa-exposicion.html)
+[2: Mapa de exposición de edificaciones](02-mapa-exposicion.html)
 :::
 ::: {.ungrd-card-body}
 Mapa nacional de densidad de edificaciones agregado por celdas, como indicador de exposición física ante amenazas.

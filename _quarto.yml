@@ -3,7 +3,7 @@ project:
   output-dir: _book
 
 book:
-  title: "Exposición de edificaciones en Colombia"
+  title: "Exposición de edificaciones sismo de San José del Palmar"
   date: "2026-08-14"
 
   downloads: [pdf]
@@ -13,7 +13,7 @@ book:
     tools:
       - icon: diagram-3-fill
         href: "https://scr-ungrd.github.io/hub/"
-        aria-label: "HUB SCR — portal de proyectos"
+        aria-label: "HUB SCR"
         target: _blank
         rel: noopener noreferrer
       - icon: github
@@ -31,13 +31,13 @@ book:
   chapters:
     - index.qmd
     - Pagina-legal.qmd
-    - text: "1. Presentación"
-      href: 01-presentacion.qmd
-    - text: "2. Metodología"
-      href: 02-metodologia.qmd
-    - text: "3. Mapa de exposición de edificaciones"
-      href: 03-mapa-exposicion.qmd
-    - 04-referencias-bibliograficas.qmd
+    - text: "Presentación"
+      href: presentacion.qmd
+    - text: "1. Metodología"
+      href: 01-metodologia.qmd
+    - text: "2. Mapa de exposición de edificaciones"
+      href: 02-mapa-exposicion.qmd
+    - 03-referencias-bibliograficas.qmd
 
 lang: es
 
