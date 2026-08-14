@@ -1,0 +1,42 @@
+# Inicio
+
+Bienvenidos al libro digital **Exposición de edificaciones en Colombia**. Este recurso ha sido diseñado por la Unidad Nacional para la Gestión del Riesgo de Desastres (UNGRD) para caracterizar la distribución espacial de las edificaciones en el territorio nacional como insumo para el análisis de exposición ante amenazas naturales.
+
+<!-- TODO: reemplazar por una portada propia con {.ungrd-cover-float}, siguiendo el ejemplo de otros libros SCR -->
+
+::: {.clearfix}
+:::
+
+::: {.d-flex .justify-content-start .mb-3}
+[Volver al Catálogo de Publicaciones SCR](https://scr-ungrd.github.io/catalogo-publicaciones/){.ungrd-btn}
+:::
+
+------------------------------------------------------------------------
+
+::::: {.ungrd-cards-grid}
+
+::: {.ungrd-card}
+::: {.ungrd-card-header}
+[Capítulo 2: Metodología](02-metodologia.html)
+:::
+::: {.ungrd-card-body}
+Fuente de datos (Google Open Buildings vía Google Earth Engine) y procesamiento realizado para transformar los polígonos de edificaciones en indicadores agregados de exposición.
+:::
+:::
+
+::: {.ungrd-card}
+::: {.ungrd-card-header}
+[Capítulo 3: Mapa de exposición de edificaciones](03-mapa-exposicion.html)
+:::
+::: {.ungrd-card-body}
+Mapa nacional de densidad de edificaciones agregado por celdas, como indicador de exposición física ante amenazas.
+:::
+:::
+
+:::::
+
+------------------------------------------------------------------------
+
+## Navegación
+
+Utiliza la navegación lateral o las tarjetas superiores para explorar los diferentes capítulos de este libro.

@@ -1,0 +1,37 @@
+---
+title: "Página Legal"
+---
+
+<!-- TODO: completar título exacto, palabras clave y DOI propios de este libro (no reutilizar el DOI de otro título de la serie) -->
+
+Exposición de edificaciones en Colombia. Bogotá, D.C., Unidad Nacional para la Gestión del Riesgo de Desastres, 2026. DOI: <PENDIENTE>
+1. Edificaciones—exposición 2. Gestión del riesgo de desastres—Colombia 3. Análisis de exposición—amenazas naturales 4. Ordenamiento territorial—gestión del riesgo municipal
+
+------------------------------------------------------------------------
+
+::: {style="line-height: 0.96;"}
+**Gustavo Petro Urrego** \| Presidente de la República
+
+**Carlos Alberto Carrillo Arenas** \| Director General,
+Unidad Nacional para la Gestión del Riesgo de Desastres (UNGRD)
+
+**Ana Milena Prada Uribe** \| Subdirectora para el Conocimiento del Riesgo
+
+------------------------------------------------------------------------
+
+**Subdirección para el Conocimiento del Riesgo**
+
+------------------------------------------------------------------------
+
+Coordinación editorial \| Mauricio Romero Torres
+
+DOI: <PENDIENTE>
+
+Copyright: © Unidad Nacional para la Gestión del Riesgo de Desastres, 2026. Bogotá, Colombia
+
+**Citación sugerida**: Unidad Nacional para la Gestión del Riesgo de Desastres, Subdirección para el Conocimiento del Riesgo. 2026. *Exposición de edificaciones en Colombia.* Unidad Nacional para la Gestión del Riesgo de Desastres. Bogotá, D.C., Colombia. <PENDIENTE>
+
+Todos los derechos reservados. Excepto si se señala otra cosa, la licencia del ítem se describe como Atribución. NoComercial-SinDerivadas 2.5 Colombia Distribución gratuita – versión digital
+:::
+
+![](media/UNGRD-Horizontal.png){fig-align="center" width="300"}

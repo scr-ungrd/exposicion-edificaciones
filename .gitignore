@@ -1,0 +1,16 @@
+# Entorno virtual y dependencias de Python
+venv/
+__pycache__/
+separador.py
+requirements.txt
+
+# Documentos originales
+data/
+
+# Archivos y carpetas generadas automáticamente por Quarto
+_book/
+.quarto/
+
+/.quarto/
+
+**/*.quarto_ipynb

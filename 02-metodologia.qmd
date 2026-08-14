@@ -1,0 +1,21 @@
+# Metodología {.unnumbered}
+
+## Fuente de datos
+
+El insumo base son las huellas de edificaciones del conjunto de datos [Open Buildings](https://sites.research.google/open-buildings/) de Google, obtenidas a través de Google Earth Engine (GEE) y exportadas como shapefile. Cada polígono incluye:
+
+- `area_m2`: área construida del edificio, en metros cuadrados.
+- `confiab`: nivel de confianza de la detección.
+
+<!-- TODO: precisar versión del dataset, fecha de exportación y filtro de confianza aplicado -->
+
+## Procesamiento
+
+Dado el volumen del conjunto de datos (6.038.048 polígonos), no es viable representar cada edificación individualmente en un mapa del libro. En su lugar, se calcula el centroide de cada polígono y se agregan sobre una grilla regular de 2 × 2 km, contando el número de edificaciones por celda. El resultado es un mapa raster estático de densidad, mucho más liviano y apropiado para un documento de este tipo que el conjunto de polígonos original (1.1 GB).
+
+La agregación se realiza en la proyección oficial del IGAC para el territorio colombiano (MAGNA-SIRGAS-CTM12, EPSG:9377), de modo que las celdas de la grilla correspondan a áreas comparables en el terreno. Por la fuerte concentración de construcciones en zonas urbanas frente a zonas rurales (mediana de 32 edificios/celda frente a un máximo de ~24.900), el mapa usa una escala de color logarítmica.
+
+Scripts de procesamiento (en `data/`, no versionados por su tamaño):
+
+- `agregar_exposicion.py`: lee el shapefile en streaming (lotes de Arrow, sin cargar los 6M geometrías en memoria a la vez) y produce `grilla_exposicion.npz` con el conteo y área construida por celda.
+- `graficar_mapa.py`: genera el PNG del mapa a partir de `grilla_exposicion.npz`.

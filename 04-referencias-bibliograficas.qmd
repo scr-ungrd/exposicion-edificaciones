@@ -1,0 +1,3 @@
+# Referencias bibliográficas {.unnumbered}
+
+Sit, M., Sirko, W., Zorzi, D., et al. Open Buildings dataset. Google Research. <https://sites.research.google/open-buildings/>
