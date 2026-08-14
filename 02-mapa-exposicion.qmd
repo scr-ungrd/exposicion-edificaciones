@@ -9,6 +9,41 @@ El siguiente mapa muestra la densidad de edificaciones agregada en celdas de 2 �
 
 ![Densidad de edificaciones por celda (2 × 2 km)](media/02-mapa-exposicion/densidad_edificaciones.png){#fig-densidad-edificaciones}
 
+## Área construida por municipio
+
+Para complementar la vista por celdas, se calculó el área construida total agregando el atributo `area_m2` de cada edificación al municipio que la contiene (unión espacial del centroide de cada polígono contra los límites municipales de Colombia, IGAC/DANE). En el área cubierta por el conjunto de datos, el total de área construida es de **761 km²**, distribuidos en 473 municipios con al menos una edificación detectada.
+
+Los 20 municipios con mayor área construida:
+
+| Municipio | Departamento | Edificios | Área construida (km²) |
+|---|---|---:|---:|
+| Bogotá D.C. | Bogotá D.C. | 904,770 | 114.45 |
+| Santiago de Cali | Valle del Cauca | 374,320 | 43.20 |
+| Medellín | Antioquia | 366,425 | 37.27 |
+| Ibagué | Tolima | 118,894 | 15.22 |
+| Madrid | Cundinamarca | 27,466 | 14.45 |
+| Pereira | Risaralda | 109,731 | 14.11 |
+| Neiva | Huila | 100,321 | 12.21 |
+| Popayán | Cauca | 113,846 | 12.19 |
+| Rionegro | Antioquia | 56,887 | 11.28 |
+| Palmira | Valle del Cauca | 69,772 | 10.95 |
+| Soacha | Cundinamarca | 82,325 | 10.74 |
+| Facatativá | Cundinamarca | 24,007 | 8.70 |
+| Funza | Cundinamarca | 20,086 | 8.35 |
+| Manizales | Caldas | 62,210 | 8.28 |
+| Chía | Cundinamarca | 46,747 | 7.61 |
+| Bello | Antioquia | 76,214 | 7.45 |
+| Buenaventura | Valle del Cauca | 88,811 | 7.15 |
+| Armenia | Quindío | 59,540 | 7.08 |
+| Yumbo | Valle del Cauca | 40,881 | 6.76 |
+| El Rosal | Cundinamarca | 9,799 | 6.64 |
+
+: Área construida por municipio (top 20) {#tbl-area-municipios}
+
+El listado completo (473 municipios) está disponible para descarga: [`area_por_municipio.csv`](data/area_por_municipio.csv).
+
+![Área construida por municipio](media/02-mapa-exposicion/area_por_municipio.png){#fig-area-municipios}
+
 # Mapa Interactivo de Exposición de Edificaciones
 
 Huellas de construcción · PMTiles + MapLibre GL · Fuente: Google Open Buildings (GEE)

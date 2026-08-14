@@ -7,6 +7,7 @@ project:
   # para que se copie a _book/ al renderizar (local y en la Action de CI).
   resources:
     - data/edificios.pmtiles
+    - data/area_por_municipio.csv
 
 book:
   title: "Exposición de edificaciones sismo de San José del Palmar"
