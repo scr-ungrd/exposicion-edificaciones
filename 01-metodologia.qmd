@@ -1,21 +1,34 @@
 # Metodología {.unnumbered}
 
-## Fuente de datos
+## Fuente de datos: edificaciones (capítulo 2)
 
-El insumo base son las huellas de edificaciones del conjunto de datos [Open Buildings](https://sites.research.google/open-buildings/) de Google, obtenidas a través de Google Earth Engine (GEE) y exportadas como shapefile. Cada polígono incluye:
+El insumo base son las huellas de edificaciones del conjunto de datos [Open Buildings](https://sites.research.google/open-buildings/) de Google, obtenidas a través de Google Earth Engine (GEE) y exportadas como shapefile (6.038.048 polígonos). Cada polígono incluye:
 
-- `area_m2`: área construida del edificio, en metros cuadrados.
+- `area_m2`: huella edificada (building footprint) de la edificación, en metros cuadrados — es la huella del polígono detectado por el satélite (proyección horizontal), **no** el área construida total del edificio (que sumaría el área de cada piso).
 - `confiab`: nivel de confianza de la detección.
 
 <!-- TODO: precisar versión del dataset, fecha de exportación y filtro de confianza aplicado -->
 
-## Procesamiento y advertencia
+## Procesamiento de edificaciones (capítulo 2)
 
-Dado el volumen del conjunto de datos (6.038.048 polígonos), no es viable representar cada edificación individualmente en un mapa del libro. En su lugar, se calcula el centroide de cada polígono y se agregan sobre una grilla regular de 2 × 2 km, contando el número de edificaciones por celda. El resultado es un mapa raster estático de densidad, mucho más liviano y apropiado para un documento de este tipo que el conjunto de polígonos original (1.1 GB).
+Dado el volumen del conjunto de datos, no es viable representar cada edificación individualmente en un mapa estático del libro. Se procesa de tres formas distintas, complementarias:
 
-La agregación se realiza en la proyección oficial del IGAC para el territorio colombiano (MAGNA-SIRGAS-CTM12, EPSG:9377), de modo que las celdas de la grilla correspondan a áreas comparables en el terreno. Por la fuerte concentración de construcciones en zonas urbanas frente a zonas rurales (mediana de 32 edificios/celda frente a un máximo de ~24.900), el mapa usa una escala de color logarítmica.
+1. **Densidad por celda** (mapa estático): se calcula el centroide de cada polígono y se agregan sobre una grilla regular de 2 × 2 km, contando el número de edificaciones por celda. El resultado es un PNG de densidad, mucho más liviano que el conjunto de polígonos original (1.1 GB). La agregación se realiza en la proyección oficial del IGAC para el territorio colombiano (MAGNA-SIRGAS-CTM12, EPSG:9377), de modo que las celdas correspondan a áreas comparables en el terreno; por la fuerte concentración de construcciones en zonas urbanas frente a rurales (mediana de 32 edificios/celda frente a un máximo de ~24.900), el mapa usa escala de color logarítmica.
+2. **Huella edificada (building footprint) por municipio** (mapa interactivo): se calcula el centroide de cada polígono y se une espacialmente (vía `shapely.STRtree`) contra los límites municipales de Colombia (IGAC/DANE), sumando `area_m2` y contando edificios por municipio. El resultado se presenta como mapa coroplético interactivo (D3 + Observable JS, ver nota de mapas interactivos abajo), no como imagen estática — a diferencia de una primera versión de este capítulo, que usaba una imagen matplotlib fija.
+3. **Mapa interactivo de huellas individuales**: se evaluó un mapa MapLibre + vector tiles (PMTiles) con cada edificación individual navegable. Se retiró del libro por decisión editorial ("no aporta al proyecto"); el trabajo de reducción de tamaño del archivo (410 MB → 37.7 MB) queda documentado y disponible en `../pmtiles-reducido/` por si se retoma más adelante.
 
-Scripts de procesamiento (en `data/`, no versionados por su tamaño):
+Scripts de procesamiento (en `data/`, versionados en git — solo las salidas intermedias regenerables como `grilla_exposicion.npz` están excluidas):
 
-- `agregar_exposicion.py`: lee el shapefile en streaming (lotes de Arrow, sin cargar los 6M geometrías en memoria a la vez) y produce `grilla_exposicion.npz` con el conteo y área construida por celda.
-- `graficar_mapa.py`: genera el PNG del mapa a partir de `grilla_exposicion.npz`.
+- `agregar_exposicion.py`: lee el shapefile en streaming (lotes de Arrow, sin cargar los 6M geometrías en memoria a la vez) y produce `grilla_exposicion.npz` con el conteo y huella edificada por celda.
+- `graficar_mapa.py`: genera el PNG de densidad a partir de `grilla_exposicion.npz`.
+- `agregar_por_municipio.py`: hace el join espacial contra municipios y produce `area_por_municipio.csv`.
+
+## Mapas interactivos (D3 + Observable JS)
+
+Los mapas coropléticos interactivos de los capítulos 2 y 3 se construyen con celdas `{ojs}` (D3 + TopoJSON) directamente en el `.qmd`, sobre `data/colombia_moderate.topojson` (límites de municipios/departamentos, IGAC/GADM v4.1). **Cada celda `{ojs}` debe tener una sola declaración top-level** — con varias declaraciones en un mismo bloque, este proyecto (`type: book`) falla silenciosamente sin cargar los datos (detalle técnico documentado en `CLAUDE.md`).
+
+## Fuente de datos: viviendas afectadas (capítulo 3)
+
+El insumo es `VIVIENDAS AFECTADAS ANALISIS.xlsx` (fuera de este repo), con el inventario de vivienda unifamiliar y el conteo de viviendas afectadas por municipio del Valle del Cauca. `data/procesar_viviendas_afectadas.py` limpia el archivo (descarta una fila de nota al pie) y normaliza los nombres de municipio — el Excel original no trae tildes — contra la misma fuente oficial de límites municipales usada en el capítulo 2. El archivo no incluye a Santiago de Cali.
+
+<!-- TODO: precisar la fuente y el evento/fecha de origen de VIVIENDAS AFECTADAS ANALISIS.xlsx -->

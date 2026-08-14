@@ -9,13 +9,13 @@ El siguiente mapa muestra la densidad de edificaciones agregada en celdas de 2 �
 
 ![Densidad de edificaciones por celda (2 × 2 km)](media/02-mapa-exposicion/densidad_edificaciones.png){#fig-densidad-edificaciones}
 
-## Área construida por municipio
+## Huella edificada (Building footprint) por municipio
 
-Para complementar la vista por celdas, se calculó el área construida total agregando el atributo `area_m2` de cada edificación al municipio que la contiene (unión espacial del centroide de cada polígono contra los límites municipales de Colombia, IGAC/DANE). En el área cubierta por el conjunto de datos, el total de área construida es de **761 km²**, distribuidos en 473 municipios con al menos una edificación detectada.
+Para complementar la vista por celdas, se calculó la huella edificada total agregando el atributo `area_m2` de cada edificación al municipio que la contiene (unión espacial del centroide de cada polígono contra los límites municipales de Colombia, IGAC/DANE). **`area_m2` es el área de la huella edificada (building footprint) de cada edificación**, es decir, la proyección horizontal del polígono detectado por el satélite, no el área construida total del edificio — un edificio de varios pisos aporta la misma huella edificada que uno de un solo piso, así tenga más área construida en total. En el área cubierta por el conjunto de datos, el total de huella edificada es de **761 km²**, distribuidos en 473 municipios con al menos una edificación detectada.
 
-Los 20 municipios con mayor área construida:
+Los 20 municipios con mayor huella edificada:
 
-| Municipio | Departamento | Edificios | Área construida (km²) |
+| Municipio | Departamento | Edificios | Huella edificada (km²) |
 |---|---|---:|---:|
 | Bogotá D.C. | Bogotá D.C. | 904,770 | 114.45 |
 | Santiago de Cali | Valle del Cauca | 374,320 | 43.20 |
@@ -38,11 +38,11 @@ Los 20 municipios con mayor área construida:
 | Yumbo | Valle del Cauca | 40,881 | 6.76 |
 | El Rosal | Cundinamarca | 9,799 | 6.64 |
 
-: Área construida por municipio (top 20) {#tbl-area-municipios}
+: Huella edificada por municipio (top 20) {#tbl-area-municipios}
 
 El listado completo (473 municipios) está disponible para descarga: [`area_por_municipio.csv`](data/area_por_municipio.csv).
 
-Mapa interactivo — solo se muestran los departamentos con al menos un municipio con edificaciones detectadas; pasa el cursor sobre un municipio para ver el número de edificios y el área construida.
+Mapa interactivo — solo se muestran los departamentos con al menos un municipio con edificaciones detectadas; pasa el cursor sobre un municipio para ver el número de edificios y la huella edificada.
 
 ```{ojs}
 //| echo: false
@@ -164,7 +164,7 @@ color_area = d3.scaleSequentialLog(d3.interpolateRgbBasis(["#eef2f8", "#c0392b"]
           ? `<b>${d.properties.municipio}</b><br>
              <span style="font-size:10px;opacity:.85">${d.properties.departamento}</span><br>
              Edificios: ${info.n_edificios.toLocaleString("es-CO")}<br>
-             Área construida: ${info.area_construida_km2.toFixed(2)} km²`
+             Huella edificada: ${info.area_construida_km2.toFixed(2)} km²`
           : `<b>${d.properties.municipio}</b><br>
              <span style="font-size:10px;opacity:.85">${d.properties.departamento}</span><br>
              Sin edificaciones detectadas`
@@ -223,7 +223,7 @@ color_area = d3.scaleSequentialLog(d3.interpolateRgbBasis(["#eef2f8", "#c0392b"]
     .attr("text-anchor", "middle")
     .style("font-size", "10px")
     .style("fill", "#333")
-    .text("Área construida por municipio (km², escala log)")
+    .text("Huella edificada por municipio (km², escala log)")
 
   return container.node()
 }
