@@ -109,7 +109,7 @@ area_max = d3.max(area_muni, d => d.area_construida_km2)
 
 ```{ojs}
 //| echo: false
-color_area = d3.scaleSequentialLog(d3.interpolateRgbBasis(["#eef2f8", "#7f97bb", "#223764"]))
+color_area = d3.scaleSequentialLog(d3.interpolateRgbBasis(["#eef2f8", "#c0392b"]))
   .domain([area_min, area_max])
 ```
 
