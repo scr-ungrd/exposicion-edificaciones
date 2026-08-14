@@ -45,7 +45,20 @@ Los datos crudos de edificaciones (huellas de Google Open Buildings vía GEE, sh
 1. **Mapa estático agregado** (imagen): polígonos agregados a una grilla de 2×2 km (conteo por celda), generada con `data/agregar_exposicion.py` + `data/graficar_mapa.py` → `media/02-mapa-exposicion/densidad_edificaciones.png`.
 2. **Mapa interactivo** (MapLibre GL + PMTiles): huellas de edificación individuales, vector tiles generados con `data/generar_pmtiles.sh` (usa `ogr2ogr` + `tippecanoe`) → `data/edificios.pmtiles`. Librerías locales (sin CDN) en `libs/` (`maplibre-gl.js/css`, `pmtiles.js`) — **`libs/` sí está en git** (a diferencia de `data/`), porque el capítulo las necesita en producción.
 
-Los scripts de procesamiento y salidas intermedias van en `data/` (en `.gitignore`, siguiendo la misma convención que el resto de libros SCR) — **excepto `data/edificios.pmtiles`, que sí está en git** (ver nota abajo).
+Los scripts (`*.py`, `*.sh`) y `data/edificios.pmtiles` **sí están en git** (excepciones explícitas en `.gitignore`, con `data/*` como regla base). Las salidas intermedias regenerables (`data/grilla_exposicion.npz`) siguen ignoradas.
+
+**Dependencias a tener en cuenta si se reutilizan estos scripts:**
+- `agregar_exposicion.py` tiene hardcodeado `BBOX_WGS84` (extent del shapefile actual, obtenido con `ogrinfo`) y rutas absolutas — para un dataset/región nueva hay que recalcular el bbox y actualizar las rutas.
+- `graficar_mapa.py` depende de `MR-Web/datascience/mapas/data/col_departamentos.geojson` (**fuera de este repo**, otro proyecto) solo para dibujar el contorno de departamentos como contexto — si ese proyecto se mueve o no existe en la máquina, este script falla.
+
+### Cómo repetir este proceso con un dataset nuevo (shapefile grande de polígonos)
+
+1. `data/agregar_exposicion.py` (editar `SHP`, `BBOX_WGS84` vía `ogrinfo -al -so`) → `graficar_mapa.py` para el mapa estático agregado.
+2. `data/generar_pmtiles.sh` (editar `SHP`) para el mapa interactivo. Primero probar con `-zg --extend-zooms-if-still-dropping` (deja que tippecanoe decida el zoom) — si el `.pmtiles` resultante pesa menos de ~50-80 MB, probablemente sirve tal cual.
+3. Si supera ~90-100 MB: **antes de pensar en hosting externo**, fijar un maxzoom explícito más bajo (`-Z0 -zN` sin `-zg`/`--extend-zooms-if-still-dropping`) y volver a generar. Empezar en N=13; si sigue pesando de más, bajar a 12, 11... Solo recurrir a filtrar por atributos de confianza si bajar el zoom no alcanza (para este dataset, bajar a z13 solo, sin filtrar, ya resolvió el tamaño).
+4. **No juzgar el tamaño mientras tippecanoe corre** — el archivo intermedio durante la fase de tiling puede verse 3× más grande que el resultado final compactado (ver ejemplo real en la sección de Historial arriba).
+5. Verificar visualmente antes de dar por bueno el recorte de zoom: `npx serve` + zoom hasta el máximo del mapa (más allá del maxzoom real, para probar el *overzoom* del navegador) y confirmar que los polígonos individuales se sigan viendo nítidos.
+6. Confirmar que `data/*.pmtiles` (o el nombre que uses) queda excluido de la regla general `data/*` en `.gitignore` con un `!data/tu-archivo.pmtiles`, y que los scripts (`*.py`/`*.sh`) también quedan versionados — si no, la próxima persona (o vos mismo) no podrá reproducir el proceso desde un clon limpio.
 
 ### `data/edificios.pmtiles` (37.7 MB) — sí está en git, no necesita hosting externo
 
